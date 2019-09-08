@@ -9,8 +9,9 @@
           <text-input v-model="form.firstName" :errors="$page.errors.first_name" class="mt-10" label="First Name" type="text" autofocus autocapitalize="off" :required="true" />
           <text-input v-model="form.lastName" :errors="$page.errors.last_name" class="mt-6" label="Last Name" type="text" autofocus autocapitalize="off" :required="true" />
           <text-input v-model="form.email" :errors="$page.errors.email" class="mt-6" label="Email" type="email" autofocus autocapitalize="off" :required="true" />
-          <text-input v-model="form.phoneNumber" :errors="$page.errors.phone_number" class="mt-6" label="Phone Number" type="text" autofocus autocapitalize="off" />
-          <span class="text-sm text-grey-dark">Make sure to fill out your phone number in order to share books!</span>
+	  <label class="form-label" class="mt-6">Phone Number:</label>
+          <vue-phone-number-input class="pb-1" default-country-code="RO"  v-model="form.phoneNumber" @update="updateNumber" />
+	  <span class="text-sm text-grey-dark">Make sure to fill out your phone number in order to share books!</span>
           <text-input v-model="form.password" :errors="$page.errors.password" class="mt-6" label="Password" type="password" :required="true" />
           <text-input v-model="form.passwordConfirmation" :errors="$page.errors.password_confirmation" class="mt-6" label="Password Confirmation" type="password" :required="true" />
         </div>
@@ -44,6 +45,7 @@ export default {
         lastname: null,
         email: null,
         phoneNumber: null,
+	formattedNumber: null,
         password: null,
         passwordConfirmation: null
       },
@@ -59,11 +61,14 @@ export default {
         first_name: this.form.firstName,
         last_name: this.form.lastName,
         email: this.form.email,
-        phone_number: this.form.phoneNumber,
+        phone_number: this.form.formattedNumber,
         password: this.form.password,
         password_confirmation: this.form.passwordConfirmation
       }).then(() => this.sending = false)
     },
-  },
+    updateNumber(e) {
+	this.form.formattedNumber = e.formattedNumber
+    },
+  }
 }
 </script>

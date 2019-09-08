@@ -13,11 +13,11 @@
           <text-input v-model="form.last_name" :errors="$page.errors.last_name" class="pr-6 pb-8 w-full lg:w-1/2" label="Last name" />
           <text-input v-model="form.email" :errors="$page.errors.email" class="pr-6 pb-8 w-full lg:w-1/2" label="Email" />
           <div class="pr-6 pb-8 w-full lg:w-1/2">
-            <text-input v-model="form.phone_number" :errors="$page.errors.phone_number" class="pb-1" label="Phone Number" />
+	    <label class="form-label">Phone Number:</label>	
+            <vue-phone-number-input default-country-code="RO"  @update="updateNumber" class="pb-1" v-model="form.phone_number" />
             <span class="text-sm text-grey-dark">Make sure to fill out your phone number in order to share books!</span>
           </div>
-          <text-input v-model="form.password" :errors="$page.errors.password" class="pr-6 pb-8 w-full lg:w-1/2" type="password" autocomplete="new-password" label="Password" />
-        </div>
+	</div>
         <div class="px-8 py-4 bg-grey-lightest border-t border-grey-lighter flex items-center">
           <loading-button :loading="sending" class="btn-green ml-auto" type="submit">Update User</loading-button>
         </div>
@@ -55,7 +55,7 @@ export default {
         last_name: this.user.last_name,
         email: this.user.email,
         phone_number: this.user.phone_number,
-        password: this.user.password,
+        formatted_phone_number: this.user.phone_number
       },
     }
   },
@@ -67,7 +67,7 @@ export default {
       data.append('first_name', this.form.first_name || '')
       data.append('last_name', this.form.last_name || '')
       data.append('email', this.form.email || '')
-      data.append('phone_number', this.form.phone_number || '')
+      data.append('phone_number', this.form.formatted_phone_number || '')
       data.append('password', this.form.password || '')
       data.append('_method', 'put')
 
@@ -79,6 +79,9 @@ export default {
           }
         })
     },
+    updateNumber(e) {
+    	this.form.formatted_phone_number = e.formattedNumber
+    }	
   },
 }
 </script>

@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Request;
 use App\Models\Library;
 use App\Models\Book;
 use App\User;
 
 class DashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
+	if (!Auth::user()->city) {
+		Auth::user()->updateLocation(Request::ip());
+	}
         $libraries = Library::where('user_id', Auth::user()->id)->count();
         $books = Book::where('user_id', Auth::user()->id)->count();
         $city = Auth::user()->city;

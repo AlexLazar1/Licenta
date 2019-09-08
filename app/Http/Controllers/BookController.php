@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Contracts\Validation\Rule;
 use App\Models\Library;
 use App\Models\Book;
 
@@ -22,7 +23,7 @@ class BookController extends Controller
     public function store(Library $library)
     {
         Request::validate([
-            'isbn' => 'required|unique:books',
+            'isbn' => 'required|unique:books,isbn,NULL,id,user_id,'.Auth::user()->id
         ]);
 
         $url = "https://www.goodreads.com/book/isbn/" . trim(Request::input('isbn')) . "?key=" . env('GOODREADS_API_KEY');
@@ -44,30 +45,37 @@ class BookController extends Controller
                 $authors .= $author->name . (!($key == count($book_JSON->book->authors->author) - 1) ? ', ' : '');
             }
         } 
-        else if ((array) $book_JSON->book->authors && !is_array($book_JSON->book->authors->author)) {
+        else if (is_string($book_JSON->book->authors->author)) {
             $authors = $book_JSON->book->authors->author->name;
         }
 
         $title = '';
-        if ((array) $book_JSON->book->work->original_title) {
-            $title = $book_JSON->book->work->original_title;
-        }
-        else if ((array) $book_JSON->book->title) {
+        if (is_string($book_JSON->book->title)) {
             $title = $book_JSON->book->title;
         }
+        else if (is_string($book_JSON->book->work->original_title)) {
+            $title = $book_JSON->book->work->original_title;
+	}
 
+	$image_url = is_string($book_JSON->book->image_url) ? $book_JSON->book->image_url : '';
+	$publication_day = is_string($book_JSON->book->work->original_publication_day) ? $book_JSON->book->work->original_publication_day :  '';
+	$publication_month = is_string($book_JSON->book->work->original_publication_month) ? $book_JSON->book->work->original_publication_month : '';
+	$publication_year = is_string($book_JSON->book->work->original_publication_year) ? $book_JSON->book->work->original_publication_year : '';
+	$publisher = is_string($book_JSON->book->publisher) ? $book_JSON->book->publisher : '';
+	$rating = is_string($book_JSON->book->average_rating) ? $book_JSON->book->average_rating : '';
+	
         $book = new Book();
         $book->isbn = Request::input('isbn');
         $book->user_id = Auth::user()->id;
         $book->library_id = $library->id;
         $book->title = $title;
         $book->author = $authors;
-        $book->image_url = (array) $book_JSON->book->image_url ? $book_JSON->book->image_url : '';
-        $book->publication_day = (array) $book_JSON->book->work->original_publication_day ? $book_JSON->book->work->original_publication_day : '';
-        $book->publication_month =(array) $book_JSON->book->work->original_publication_month ? $book_JSON->book->work->original_publication_month : '';
-        $book->publication_year = (array) $book_JSON->book->work->original_publication_year ? $book_JSON->book->work->original_publication_year : '';
-        $book->publisher = (array) $book_JSON->book->publisher ? $book_JSON->book->publisher : '';
-        $book->rating = (array) $book_JSON->book->average_rating ? $book_JSON->book->average_rating : '';
+        $book->image_url = $image_url;
+        $book->publication_day = $publication_day;
+        $book->publication_month = $publication_month;
+        $book->publication_year = $publication_year;
+        $book->publisher = $publisher;
+        $book->rating = $rating;
         $book->save();
 
         return Redirect::route('libraries.books', $library->id)->with('success', 'Library created.');

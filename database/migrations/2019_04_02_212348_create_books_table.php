@@ -28,7 +28,6 @@ class CreateBooksTable extends Migration
             $table->string('publication_year')->nullable();
             $table->string('publisher')->nullable();
             $table->string('rating')->nullable();
-            $table->softDeletes();
         });
     }
 

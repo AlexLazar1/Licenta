@@ -25,7 +25,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     public function getLocationAttribute() {
-        return new Location($this->latitude, $this->longitude);
+	if ($this->latitude) return new Location($this->latitude, $this->longitude);
     }
 
     public function setPasswordAttribute($password)
