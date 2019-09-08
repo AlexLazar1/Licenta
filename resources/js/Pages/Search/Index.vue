@@ -45,7 +45,7 @@
         <span>No books found.</span>
       </div>
     </div>
-    <pagination :links="paginated_search_results" />
+    <pagination :links="paginated_search_results.links" />
   </layout>
 </template>
 
