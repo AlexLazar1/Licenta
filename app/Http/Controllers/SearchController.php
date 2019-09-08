@@ -18,11 +18,11 @@ class SearchController extends Controller
             Auth::user()->updateLocation(Request::ip());
         }
 
-        $bookResults = Book::with('user')
-            ->whereLike('title', Request::input('keywords'))
-            ->whereLike('author', Request::input('keywords'))
-            ->whereHas("user", function ($query) {
+        $bookResults = Book::whereHas("user", function ($query) {
                 $query->whereNotNull('phone_number')->where('city', '=', Auth::user()->city);
+            })
+            ->where(function($query) {
+                $query->whereLike('title', Request::input('keywords'))->whereLike('author', Request::input('keywords'));
             })
             ->paginate();
 
@@ -49,10 +49,5 @@ class SearchController extends Controller
         ) * 2;
 
         return round(Location::EARTH_RADIUS * $angle, $precision);
-    }
-
-    function kilometers(Location $x, Location $y, int $precision = 0)
-    {
-        return round(meters($x, $y) * 0.001, $precision);
     }
 }
